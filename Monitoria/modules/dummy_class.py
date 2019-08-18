@@ -4,11 +4,17 @@ def dummy_class(students = 0):
     '''
     #from numpy.random import choice
     from faker import Faker
+    from random import randint
 
     fake = Faker('pt_BR')
     #fake.seed(1234)
 
     names = [ fake.name() for i in range(students) ]
+
+    nusps = []
+    for index in range(students):
+        nusps.append(randint(int(1e6), int(1.2e7)))
+    #nusps  [ for i in range(students)]
 
     groups = [ "{}".format(num) + letter
         for num in range(1,12)
@@ -17,8 +23,8 @@ def dummy_class(students = 0):
     fake_class = []
     group_index = 0
     members = 0
-    for name in names:
-        fake_class.append((name, groups[group_index]))
+    for name, nusp in list(zip(names, nusps)):
+        fake_class.append((name,nusp, groups[group_index]))
         members += 1
         if members == 3:
             members = 0
@@ -30,5 +36,5 @@ def dummy_class(students = 0):
 if __name__ == '__main__':
     from sys import argv
     students = int(argv[1])
-    for name, group in dummy_class(students):
-        print(name + " " + group)
+    for name, nusp, group in dummy_class(students):
+        print(name + " " + str(nusp) + ' '+ group)
