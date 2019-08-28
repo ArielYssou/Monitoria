@@ -13,7 +13,7 @@ class Menu():
             self.nusps[name] = nusp
         self.freqs = {}
 
-        # Definig colros
+        # Defining colros
         self.hilight =  1
         curses.init_pair(self.hilight, 2, -1)
         self.present_A = 2
@@ -67,12 +67,20 @@ class Menu():
         self.hname = self.students[self.middle][0]
         self.hgroup = self.students[self.middle][1]
         self.freq = ''
+    
+    def rewind(self):
+        while True:
+            if self.students[self.middle - 1][0] == self.empty:
+                break
+            else:
+                self.up()
 
     def down(self):
         '''
         Moves the menu down by rearranging the array
         '''
         if self.students[self.middle + 1][0] == self.empty:
+            self.rewind()
             pass
         else:
             var = self.students.pop(0)
@@ -87,9 +95,12 @@ class Menu():
         '''
         while self.freqs[self.hname] != '-':
             self.down()
-            if '-' not in self.freqs:
+            if '-' not in self.freqs.values():
                 break
-
+            #elif self.students[self.middle + 1][0] == self.empty:
+                #break
+            else:
+                pass
 
     def show(self, screen):
         '''
@@ -173,12 +184,11 @@ def frequency(names = [], nusps = [], groups = [], aula = 0):
         while True:
             char = screen.getch()
             if char == keyboard.esc:
-                curses.nocbreak(); screen.keypad(0); curses.echo()
-                curses.endwin()
                 break
             elif char == ord('0'):
                 menu.freqs[menu.hname] = '0'
-                menu.down()
+                #menu.down()
+                menu.tail()
             elif char in keyboard.alphanumerical:
                 if char == ord('q'):
                     menu.freq = ''
@@ -205,10 +215,12 @@ def frequency(names = [], nusps = [], groups = [], aula = 0):
                     menu.freq = ''
             else:
                 menu.freq = ''
+
             menu.show(screen)
 
             if '-' not in menu.freqs.values():
                 break
+
     finally:
         # shut down cleanly
         menu.show(screen)
@@ -223,6 +235,16 @@ def frequency(names = [], nusps = [], groups = [], aula = 0):
                 pass
         output_file.close()
 
+def round_name(name = '', end = True):
+    names = name.title().split()
+    if end:
+        offset = 1
+    else:
+        offset = 0
+    for index in range(1, len(names) - offset):
+        names[index] = names[index][0] + '.'
+    return ' '.join(names)
+
 
 if __name__ == '__main__':
     from modules.dummy_class import dummy_class
@@ -232,7 +254,7 @@ if __name__ == '__main__':
     groups = []
     students = 20
     for name, nusp, group in dummy_class(students):
-        names.append(name)
+        names.append(round_name(name))
         nusps.append(nusp)
         groups.append(group)
 

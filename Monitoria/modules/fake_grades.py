@@ -1,9 +1,5 @@
-from dummy_class import dummy_class
-from datetime import date, datetime
-from time import strptime , mktime, localtime, strftime
-from random import random
-
 def strTimeProp(start, end, format, prop):
+    from time import mktime, strftime, strptime, localtime
     """Get a time at a proportion of a range of two formatted times.
 
     start and end should be strings specifying times formated in the
@@ -19,7 +15,9 @@ def strTimeProp(start, end, format, prop):
 def RandomDate(start, end, prop):
     return strTimeProp(start, end, '%d/%m/%Y %H:%M', prop)
 
-def fake_grades(turma):
+def fake_grades(turma, aula = 99, act = 'QPrev' , target = './'):
+    from datetime import date, datetime
+    from random import random
     '''
     INPUT: Tuple with name, nusp and group.
         Activity type (QPrev, ATC, Lista)
@@ -37,15 +35,11 @@ def fake_grades(turma):
             'Tempo utilizado,',
             'Avaliar/10,10'
             ]
-    code = '4302111'
-    year = '2019'
-    act = 'QPrev'
-    aula = 24
-    fname = f"{code}-{year}-{act} - aula {aula}-notas.csv"
+    course_code = '4302111'
+    fname = f"{course_code}-2019-{act} - aula {aula}-notas.csv"
 
     fake_year = ['1/1/2027 0:01', '1/1/2027 23:59']
 
-    target = './'
     dfile = open(str(target+fname), 'w+')
 
     for field in fields:
@@ -93,7 +87,12 @@ def fake_grades(turma):
 
     dfile.close()
 
+if __name__ == '__main__':
+    from dummy_class import dummy_class
 
+    turma = dummy_class(10)
+    fake_grades(turma)
+    exit(0)
 
 
         

@@ -2,7 +2,12 @@ import numpy as np
 import pandas as pd
 #import matplotlib.pyplot as plt
 
-class_df = pd.read_csv('class.csv', dtype=object, header=0, index_col=False)
+class_df = pd.read_csv(
+        'class.csv',
+        dtype=object,
+        header=0,
+        index_col=False
+        )
 
 print(class_df.info())
 
