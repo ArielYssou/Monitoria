@@ -165,7 +165,15 @@ class Keyboard():
         self.home = 262
         self.end = 360
 
-def frequency(names = [], nusps = [], groups = [], aula = 0):
+def frequency(turma, aula = 0):
+    names = []
+    nusps = []
+    groups = []
+    for name, nusp, group in turma:
+        names.append(name)
+        nusps.append(nusp)
+        groups.append(group)
+
     screen = curses.initscr() #initialize curses window
     rows, cols = screen.getmaxyx()
 
@@ -249,14 +257,9 @@ def round_name(name = '', end = True):
 if __name__ == '__main__':
     from modules.dummy_class import dummy_class
 
-    names = []
-    nusps = []
-    groups = []
+    aula = 98
     students = 20
-    for name, nusp, group in dummy_class(students):
-        names.append(round_name(name))
-        nusps.append(nusp)
-        groups.append(group)
+    turma = dummy_class(students)
+    frequency(turma, aula)
 
-    frequency(names, nusps, groups)
     exit(0)

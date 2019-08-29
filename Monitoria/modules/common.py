@@ -31,3 +31,22 @@ def change_last(string = '', char = '', substitute = ''):
         return string[:k] + substitute + string[k+1:] 
     else:
         return string
+
+def sort_class(turma):
+    names = []
+    groups = []
+    nusps = {}
+    for name, nusp, group in turma:
+        names.append(name)
+        groups.append(group)
+        nusps[name] = nusp
+
+    students = []
+    students = sorted(
+            list(zip(names, ["{:>3}".format(gp) for gp in groups])),
+            key = lambda x: (x[1], x[0])
+            )
+
+    turma = []
+    for name, group in students:
+        turma.append( (name, nusps[name], group) )
