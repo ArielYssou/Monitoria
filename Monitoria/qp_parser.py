@@ -1,38 +1,49 @@
 # Disclaimer: This was intentionally not implemented with pandas for portability reasons, but it could be implemented in a more suscint and elegant way using that module
 
-
-def qp_parse(turma, aula):
+def parse_grades(turma, activity = '', num = 0):
     '''
     INPUT: List of tuples containing the name, nusp and group of the students, number of the class
     OUTPUT: Saves "grade, nusp" in file in ./grades/qprev and prints >only< the the grades in *alphabetical* order
     '''
-    from modules.common import search_dir, change_last
+    from modules.common import search_dir, change_last, Turma
 
-    activity_strings = ['QPrev', f'aula {aula}']
+    unique_strings = {
+            'qp' : ['QPrev', f'aula {num}'],
+            'atc' : ['ATC', f'{num:02d}'],
+            'list' : ['Lista {num}', 'notas']
+            }
 
-    files = search_dir('./', activity_strings)
+    files = search_dir('./', unique_strings[activity])
 
-    if len(files) > 1:
-        print("Warning! Multiple files found:")
-        for file in files:
-            print(f"\033[38;5;3m{file}\033[0m")
-        print("Exiting before it's too late :o")
-        return 1
-    elif len(files) == 0:
+    if len(files) == 0:
         print("\033[38;5;1mNo files found for this class\033[0m")
         return 1
-    else:
-        print(f"\033[38;5;2mFound file {files[0]}\033[0m")
-        pass
 
-    names = []
-    nusps = []
-    groups = []
+    copy_strings = [ f"({i})" for i in range(10) ] 
+    for elem in copy_strings:
+        for file in files:
+            if elem in file:
+                print(f"Found a possible duplicate file: {file}. Aborting")
+                return 1
 
-    for name, nusp, group in turma:
-        names.append(name)
-        nusps.append(str(nusp))
-        groups.append(group)
+    print("Found files:")
+    for file in files:
+        print(f"\033[38;5;2m{file}\033[0m")
+
+    if activity == 'atc':
+        try:
+            freq_file = open('./grades/freqs/aula_{num}.csv', 'r')
+            freqs = {}
+            for line in freq_file.read().splitlines():
+                nusp, group = line.split(',')
+                freqs[nusp] = str(group)
+        except FileNotFoundError:
+            print("No attedance was made for this class, aborting.")
+            return 1
+        for name, nusp in turma.nusps.items():
+            if str(nusp) not in freqs.keys():
+                print(f"Warning! Student {name} - {nusp} was not in the attedence!")
+                freq[str(nusp)] = '0'
 
     with open(files[0]) as f:
         fields = f.readline().strip().rsplit(',')
@@ -50,38 +61,81 @@ def qp_parse(turma, aula):
 
         if -1 in (nusp_idx, grade_idx):
             print("Could not find columns with nusp or grades!")
-            exit(0)
+            return 1
 
-    grades = {}
-    with open(files[0], 'r') as dfile:
-        next(dfile)
-        for line in dfile.read().splitlines():
-            # We make the assumption that the grades are in the last column, if tihs is not true the next two lines have to be adjusted
-            #if '-' in line:
-            line = change_last(line, '-', '0,0') # Regularizes the last column
-            line = change_last(line, ',', '.') # Converts comma separated numbers
+    final_grades = {}
+    for nusp in turma.nusps.values():
+        final_grades[nusp] = 0
 
-            fields = line.rsplit(',')
+    final_groups = {}
+    for group in set(turma.groups):
+        final_groups[group] = 0
 
-            name = fields[1] + ' ' + fields[0] #Not used, but kept just in case
-            nusp = fields[nusp_idx]
-            grade = str(fields[grade_idx])
-            grade = grade.replace('\"', '')
-            grade = float(grade.replace(',', '.'))
+    for file in files:
+        grades = {}
+        group_grades = {}
+        with open(file, 'r') as f:
+            next(f)
+            print('-' * 70)
+            print(file)
+            print('-' * 70)
+            for line in f.read().splitlines():
+                print(line)
+                line = change_last(line, '-', '0,0')
+                line = change_last(line, ',', '.')
+                fields = line.rsplit(',')
 
-            if nusp in nusps:
-                if nusp in grades.keys():
-                    if grade >= grades[nusp]:
-                        grades[nusp] = grade
+                nusp = fields[nusp_idx]
+                grade = str(fields[grade_idx])
+                grade = grade.replace('\"', '')
+                grade = float(grade.replace(',', '.'))
+
+                if nusp in turma.nusps.values():
+                    if activity == 'atc':
+                        group = turma.groups[nusp]
+                        if group in group_grades.keys():
+                            if grade >= group_grades[group]:
+                                group_grades[group] = grade
+                            else:
+                                pass
+                        else:
+                            group_grades[group] = grade
                     else:
-                        pass
+                        if nusp in grades.keys():
+                            if grade >= grades[nusp]:
+                                grades[nusp] = grade
+                            else:
+                                pass
+                        else:
+                            grades[nusp] = grade
                 else:
-                    grades[nusp] = grade
-            else:
-                pass
+                    pass
+        if activity == 'atc':
+            for group, grade in group_grades.items():
+                if group in final_groups.keys():
+                    final_groups[group] += grade
+                else:
+                    final_groups[group] = grade
+        else:
+            for nusp, grade in grades.items():
+                if nusp in final_grades.keys():
+                    final_grades[nusp] += grade
+                else:
+                    final_grades[nusp] = grade
+    
+    if activity == 'atc':
+        final_groups['0'] = 0
+        for key in final_groups.keys():
+            final_groups[key] /= len(files)
+        for nusp in turma.nusps.values():
+            final_grades[nusp] = final_groups[ freqs[nusp] ]
+    else:
+        for nusp in final_grades.keys():
+            final_grades[nusp] /= len(files)
 
-    for nusp, grade in grades.items():
-        print(f"{nusp} - {grade}")
+    turma.sort()
+    for name, nusp, group in turma.students:
+        print(f"{nusp} - {final_grades[nusp]}")
 
 def atc_parse(turma, aula):
     '''
@@ -104,15 +158,15 @@ def atc_parse(turma, aula):
         return 1
 
     final_grades = {}
-    for name, nusp, group in turma:
+    for name, nusp, group in turma.students:
         final_grades[group] = 0
 
         if str(nusp) not in groups.keys():
             print(f"Warning! Student {name} - {nusp} was not in the attedence!")
             groups[str(nusp)] = '0'
 
-    activity_strings = ['ATC', f'{aula:02d}']
-    files = search_dir('./', activity_strings)
+    activityivity_strings = ['ATC', f'{aula:02d}']
+    files = search_dir('./', activityivity_strings)
 
     partes = [ f"parte {i}" for i in range(4) ]
     for parte in partes:
@@ -194,10 +248,9 @@ def atc_parse(turma, aula):
 
     print('-' * 40)
 
-    sort_class(turma)
-    for name, nusp, group in turma:
+    turma.sort()
+    for name, nusp, group in turma.students:
         print(f"{nusp} - {final_grades[group]}")
-
 def list_parse(turma, num, parte = ''):
     '''
     INPUT: List of tuples containing the name, nusp and group of the students, number of the list
@@ -211,10 +264,10 @@ def list_parse(turma, num, parte = ''):
     for name, nusp, group in turma:
         final_grades[group] = 0
 
-    activity_strings = ['Lista {num}', 'notas']
+    activityivity_strings = ['Lista {num}', 'notas']
     if parte != '':
-        activity_strings.append(f'parte {parte}')
-    files = search_dir('./', activity_strings)
+        activityivity_strings.append(f'parte {parte}')
+    files = search_dir('./', activityivity_strings)
 
     if len(files) > 1:
         print("Warning! Multiple files found:")
@@ -280,15 +333,18 @@ if __name__ == '__main__':
     from modules.fake_grades import fake_grades, fake_attedence
 
     students = 10
+    activity = 'atc'
     turma = dummy_class(students)
-    for name, nusp, group in turma:
+
+    for name, nusp, group in turma.students:
         print(f'{name} - {nusp} - {group}')
     print('-' * 70)
-    aula = 98
-    fake_grades(turma, aula, 'atc', './')
-    fake_attedence(turma, aula)
 
-    atc_parse(turma, aula) 
+    num = 98
+    fake_grades(turma, num, activity, './')
+    fake_attedence(turma, num)
+
+    parse_grades(turma, activity, num) 
 
     exit(0)
 

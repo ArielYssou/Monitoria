@@ -15,8 +15,9 @@ def strTimeProp(start, end, format, prop):
 def RandomDate(start, end, prop):
     return strTimeProp(start, end, '%d/%m/%Y %H:%M', prop)
 
-def fake_grades(turma, aula = 99, act = 'qp' , target = './', parts = 2):
+def fake_grades(turma, aula = 0, act = '' , target = './', parts = 2):
     from datetime import date, datetime
+    from modules.common import Turma
     from random import random
     '''
     INPUT: Tuple with name, nusp and group.
@@ -24,6 +25,7 @@ def fake_grades(turma, aula = 99, act = 'qp' , target = './', parts = 2):
         Number of subparts ( Some activitys have several parts, like ATCs)
     OUTPUT: File in ~/Dowloads with  a fake grades file
     '''
+
     fields = [
             'Sobenome,',
             'Nome,',
@@ -38,9 +40,10 @@ def fake_grades(turma, aula = 99, act = 'qp' , target = './', parts = 2):
     course_code = '4302111'
     fake_year = ['1/1/2027 0:01', '1/1/2027 23:59']
 
-    files = [] 
+    files = []
     if act == 'qp':
         act_identifier = 'QPrev'
+        part = ''
         files.append(f"{course_code}-2019-{act_identifier} - aula {aula}{part}-notas.csv")
     elif act == 'atc':
         act_identifier = 'ATC'
@@ -54,7 +57,7 @@ def fake_grades(turma, aula = 99, act = 'qp' , target = './', parts = 2):
             dfile.write(field)
         dfile.write("\n")
 
-        for name, nusp, group in turma:
+        for name, nusp, group in turma.students:
             # Family name and name
             names = name.rsplit()
 
@@ -97,10 +100,11 @@ def fake_grades(turma, aula = 99, act = 'qp' , target = './', parts = 2):
 
 def fake_attedence(turma, aula):
     from random import random
+    from modules.common import Turma
     freq = 0.6
 
     freq_file = open('./grades/freqs/aula_{aula}.csv', 'w')
-    for name, nusp, group in turma:
+    for name, nusp, group in turma.students:
         if random() <= freq:
             freq_file.write(f"{nusp},{group}\n")
         else:

@@ -1,3 +1,42 @@
+class Turma(object):
+    def __init__(self):
+        self.students = []
+        self.names = []
+        self.nusps = {}
+        self.groups = {}
+        self.effec_groups = []
+
+    def add(self, name, nusp, group, effec = ''):
+        self.students.append( (str(name), str(nusp), str(group)) )
+        self.names.append(str(name))
+        self.groups[str(nusp)] = str(group)
+        self.nusps[str(name)] = str(nusp)
+
+    def group_sort(self):
+        '''
+        Sorts self.students by group and then alphabetically. The main use of this function is to print the class in the attedence module
+        '''
+        new_list = []
+        new_list = sorted(
+                list(zip(self.names, ["{:>3}".format(self.groups[nusp]) for nusp in self.nusps.values()])),
+                key = lambda x: (x[1], x[0])
+                )
+
+        del self.students[:]
+        for name, group in new_list:
+            self.add(name, self.nusps[name], group.replace(' ',''))
+
+    def sort(self):
+        new_list = []
+        new_list = sorted(
+                list(zip(self.names, ["{:>3}".format(self.groups[nusp]) for nusp in self.nusps.values()])),
+                key = lambda x: x[0]
+                )
+
+        del self.students[:]
+        for name, group in new_list:
+            self.add(name, self.nusps[name], group.replace(' ',''))
+
 def search_dir(target = './', search_for = [''], match_all = True):
     '''
     INPUT: Target to directory. List of substrings to search
@@ -31,22 +70,3 @@ def change_last(string = '', char = '', substitute = ''):
         return string[:k] + substitute + string[k+1:] 
     else:
         return string
-
-def sort_class(turma):
-    names = []
-    groups = []
-    nusps = {}
-    for name, nusp, group in turma:
-        names.append(name)
-        groups.append(group)
-        nusps[name] = nusp
-
-    students = []
-    students = sorted(
-            list(zip(names, ["{:>3}".format(gp) for gp in groups])),
-            key = lambda x: (x[1], x[0])
-            )
-
-    turma = []
-    for name, group in students:
-        turma.append( (name, nusps[name], group) )

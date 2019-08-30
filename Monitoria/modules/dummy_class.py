@@ -4,6 +4,7 @@ def dummy_class(students = 0):
     '''
     #from numpy.random import choice
     from faker import Faker
+    from modules.common import Turma
     from random import randint
 
     fake = Faker('pt_BR')
@@ -20,21 +21,21 @@ def dummy_class(students = 0):
         for num in range(1,12)
         for letter in ['A', 'B']]
 
-    fake_class = []
+    fake_class = Turma()
     group_index = 0
     members = 0
     for name, nusp in list(zip(names, nusps)):
-        fake_class.append((name,nusp, groups[group_index]))
+        fake_class.add(name, nusp, groups[group_index])
         members += 1
         if members == 3:
             members = 0
             group_index += 1
     #groups = choice(groups, students)
-
     return fake_class
 
 if __name__ == '__main__':
     from sys import argv
     students = int(argv[1])
-    for name, nusp, group in dummy_class(students):
+    turma = dummy_class(students)
+    for name, nusp, group in turma.students:
         print(name + " " + str(nusp) + ' '+ group)
