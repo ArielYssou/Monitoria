@@ -49,6 +49,19 @@ def fake_grades(turma, aula = 0, act = '' , target = './', parts = 2):
         act_identifier = 'ATC'
         for part in range(parts):
             files.append(f"{course_code}-2019-{act_identifier}-{aula:02d} (parte {part + 1})-notas.csv")
+    elif act == 'list':
+        num_part = ''
+        char_part = ''
+        for char in aula:
+            if char.isdigit():
+                num_part = num_part + char
+            else:
+                char_part = char_part + char
+        if char_part != '':
+            part = f" (parte {char_part.upper()})"
+        else:
+            part = ''
+        files.append(f"{course_code}-2019-Lista {num_part}{part}-notas.csv")
 
     for file in files:
         dfile = open(str(target+file), 'w+')
@@ -103,7 +116,7 @@ def fake_attedence(turma, aula):
     from modules.common import Turma
     freq = 0.6
 
-    freq_file = open('./grades/freqs/aula_{aula}.csv', 'w')
+    freq_file = open(f'./grades/freqs/aula_{aula}.csv', 'w')
     for name, nusp, group in turma.students:
         if random() <= freq:
             freq_file.write(f"{nusp},{group}\n")
@@ -119,7 +132,3 @@ if __name__ == '__main__':
     act = 'atc'
     fake_grades(turma, aula, act)
     exit(0)
-
-
-        
-
