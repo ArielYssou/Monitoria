@@ -48,7 +48,7 @@ def fake_grades(turma, aula = 0, act = '' , target = './', parts = 2):
     elif act == 'atc':
         act_identifier = 'ATC'
         for part in range(parts):
-            files.append(f"{course_code}-2019-{act_identifier}-{aula:02d} (parte {part + 1})-notas.csv")
+            files.append(f"{course_code}-2019-{act_identifier}-{int(aula):02d} (parte {part + 1})-notas.csv")
     elif act == 'list':
         num_part = ''
         char_part = ''

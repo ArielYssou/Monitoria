@@ -2,7 +2,7 @@ class Error(Exception):
     '''Base class for other exceptions'''
     pass
 
-class InputError(Error):
+class MultipleFilesError(Error):
     """Exception raised for errors in the input.
 
     Attributes:
@@ -10,21 +10,35 @@ class InputError(Error):
         message -- explanation of the error
     """
 
-    def __init__(self, expression, message):
-        self.expression = expression
+    def __init__(self, files, message):
+        self.files = expression
         self.message = message
 
-class TransitionError(Error):
-    """Raised when an operation attempts a state transition that's not
-    allowed.
+class AmbiguousFileError(Error):
+    """Exception raised for errors in the input.
 
     Attributes:
-        previous -- state at beginning of transition
-        next -- attempted new state
-        message -- explanation of why the specific transition is not allowed
+        expression -- input expression in which the error occurred
+        message -- explanation of the error
     """
 
-    def __init__(self, previous, next, message):
-        self.previous = previous
-        self.next = next
+    def __init__(self, message, files = []):
+        self.message = message
+        self.files = files
+
+    def __str__(self):
+        line = f"{self.message}"
+        for file in self.files:
+            line = line + '\n' + str(file)
+        return line
+
+class InvalidInputError(Error):
+    """Exception raised for errors in the input.
+
+    Attributes:
+        expression -- input expression in which the error occurred
+        message -- explanation of the error
+    """
+
+    def __init__(self, message):
         self.message = message

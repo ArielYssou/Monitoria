@@ -49,7 +49,8 @@ def search_dir(target = './', search_for = [''], match_all = True):
         if path.isfile(path.join(target, item)):
             matches = 0
             for substring in search_for:
-                if substring in item:
+                if str(substring) in item:
+                    #print(f"file{item} matched {substring}")
                     matches += 1
             if match_all:
                 if matches == len(search_for):
@@ -60,13 +61,20 @@ def search_dir(target = './', search_for = [''], match_all = True):
                 pass
     return files
 
-def change_last(string = '', char = '', substitute = ''):
+def nth_repl(string, patt, repl = "", n = 0):
     '''
-    INPUT: String and char to be removed
-    OUTPUT: String without the last occurence of the given char
+    INPUT: Full string, pattern to be replaced, replacement stirng, pos of replacement
+    OUTPUT: String wit the nth occurence of pattern replaced. If no matching patters is found, returns the original string
     '''
-    k = string.rfind(char)
-    if k >= 0:
-        return string[:k] + substitute + string[k+1:] 
-    else:
+    match = string.find(patt)
+    if match == -1:
         return string
+
+    index = 0
+    while match != -1 and index != n:
+        # match + 1 means we start at the last match start index + 1
+        match = string.find(patt, match + 1)
+        iindex += 1
+    if index == n:
+        return string[:match] + repl + string[match + len(patt):]
+    return string
