@@ -150,6 +150,9 @@ class Keyboard():
         self.end = 360
 
 def create_menu(elements = [], default_values = [], rows = 0): 
+    '''
+        Displays the Menu object in a curses window untill the stop condition is met. Returns a dic relating the elements to their final values
+    '''
 
     screen = curses.initscr() #initialize curses window
     rows, cols = screen.getmaxyx()
@@ -168,10 +171,12 @@ def create_menu(elements = [], default_values = [], rows = 0):
     try:
         while True:
             char = screen.getch()
+            hlght_elem = menu.lines[menu.middle][0] # Shorthand notations for simplicity
+            hlght_val = menu.lines[menu.middle][1] #
             if char == keyboard.esc:
                 break
             elif char == ord('0'):
-                menu.current_values[menu.hlght_elem] = '0'
+                menu.current_values[hlght_elem] = '0'
                 #menu.down()
                 menu.tail()
             elif char in keyboard.alphanumerical:
@@ -187,16 +192,16 @@ def create_menu(elements = [], default_values = [], rows = 0):
                 menu.buffer = ''
             elif char == keyboard.enter:
                 if menu.buffer == '':
-                    menu.current_values[menu.hlght_elem] = menu.hlght_val
+                    menu.current_values[hlght_elem] = hlght_val
                     #menu.down()
                     menu.tail()
                 else:
                     if menu.buffer.upper() in menu.groups:
-                        menu.current_values[menu.hlght_elem] = menu.buffer.upper()
+                        menu.current_values[hlght_elem] = menu.buffer.upper()
                         #menu.down()
                         menu.tail()
                     else:
-                        menu.current_values[menu.hlght_elem] = '-'
+                        menu.current_values[hlght_elem] = '-'
                     menu.buffer = ''
             else:
                 menu.buffer = ''
@@ -211,14 +216,7 @@ def create_menu(elements = [], default_values = [], rows = 0):
         menu.show(screen)
         curses.nocbreak(); screen.keypad(0); curses.echo()
         curses.endwin()
-        output_file = open(f'./grades/freqs/aula_{aula}.csv', "w+")
-        for elem, buffer in menu.current_values.items():
-            if elem != menu.empty:
-                output_file.write(f"{menu.nusps[elem]},{buffer.replace(' ','')}\n")
-                print(f"{menu.nusps[elem]},{buffer.replace(' ','')}")
-            else:
-                pass
-        output_file.close()
+        return menu.current_values
 
 def round_elem(elem = '', end = True):
     elems = elem.title().split()
@@ -238,5 +236,13 @@ if __name__ == '__main__':
     lines = 20
     turma = dummy_class(lines)
     frequency(turma, aula)
+    output_file = open(f'./grades/freqs/aula_{aula}.csv', "w+")
+    for elem, buffer in menu.current_values.items():
+        if elem != menu.empty:
+            output_file.write(f"{menu.nusps[elem]},{buffer.replace(' ','')}\n")
+            print(f"{menu.nusps[elem]},{buffer.replace(' ','')}")
+        else:
+                pass
+        output_file.close()
 
     exit(0)
