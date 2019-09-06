@@ -1,19 +1,15 @@
 import curses
 
 class Menu():
-    def __init__(self, names = [], nusps =[], groups = [], rows = 0):
-        self.students = []
-        self.students = sorted(
-                list(zip(names, ["{:>3}".format(gp) for gp in groups])),
+    def __init__(self, elements = [], default_values = [], groups = [], rows = 0):
+        self.lines = []
+        self.val_format = '{:>3}'
+        self.lines = sorted(
+                list(zip(elements, [val_format.format(val) for val in default_values])),
                 key = lambda x: (x[1], x[0])
                 )
-        # Groups are made into left-paded strings with 3 chars so the 'sort' funtion will place 10 after 9 correctly and A groups before B. Finally sorts by group and then by name
-        self.nusps = {}
-        for name, nusp in list(zip(names, nusps)):
-            self.nusps[name] = nusp
-        self.freqs = {}
 
-        # Defining colros
+        # Defining colors
         self.hilight =  1
         curses.init_pair(self.hilight, 2, -1)
         self.present_A = 2
@@ -29,48 +25,38 @@ class Menu():
         self.rows = rows
         self.middle = int(self.rows/2)
 
+        self.current_values = {}
+        for element, default_value in self.lines:
+            self.current_values[elem] = '-'
+
         self.empty =  ''
-        self.freqs[self.empty] = self.empty
+        self.current_values[self.empty] = self.empty
 
-        self.groups = [ "{}".format(num) + letter
-            for num in range(1,12)
-            for letter in ['A', 'B']] 
-
-        for name, group in self.students:
-            self.freqs[name] = '-'
-
-        # In order to always show the current student in the middle
+        # In order to always show the current element in the middle
         # we insert empty lines to 'fill' the screen. With the use 
         # of the 'curses' module this could be avoided, but it would
         # require some structural changes.
         for index in range(self.middle):
-            self.students.insert(0, (self.empty, self.empty))
-        for index in range(self.middle + len(names), self.rows):
-            self.students.append((self.empty, self.empty))
+            self.lines.insert(0, (self.empty, self.empty))
+        for index in range(self.middle + len(elems), self.rows):
+            self.lines.append((self.empty, self.empty))
 
-        self.hname = ""
-        self.hgroup = ""
-        self.hname = self.students[self.middle][0]
-        self.hgroup = self.students[self.middle][1]
-
-        self.freq = ''
+        self.buffer = ''
 
     def up(self):
         '''
         Moves the menu up by rearranging the array
         '''
-        if self.students[self.middle - 1][0] == self.empty:
+        if self.lines[self.middle - 1][0] == self.empty:
             pass
         else:
-            var = self.students.pop()
-            self.students.insert(0, var)
-        self.hname = self.students[self.middle][0]
-        self.hgroup = self.students[self.middle][1]
-        self.freq = ''
+            var = self.lines.pop()
+            self.lines.insert(0, var)
+        self.buffer = ''
     
     def rewind(self):
         while True:
-            if self.students[self.middle - 1][0] == self.empty:
+            if self.lines[self.middle - 1][0] == self.empty:
                 break
             else:
                 self.up()
@@ -79,25 +65,23 @@ class Menu():
         '''
         Moves the menu down by rearranging the array
         '''
-        if self.students[self.middle + 1][0] == self.empty:
+        if self.lines[self.middle + 1][0] == self.empty:
             self.rewind()
             pass
         else:
-            var = self.students.pop(0)
-            self.students.append(var)
-        self.hname = self.students[self.middle][0]
-        self.hgroup = self.students[self.middle][1]
-        self.freq = ''
+            var = self.lines.pop(0)
+            self.lines.append(var)
+        self.buffer = ''
 
     def tail(self):
         '''
-        Moves the menu down to the next unacconted attedence.
+        Moves the menu down to the next unacconted element.
         '''
-        while self.freqs[self.hname] != '-':
+        while self.lines[self.middle][1] != '-':
             self.down()
-            if '-' not in self.freqs.values():
+            if '-' not in self.current_values:
                 break
-            #elif self.students[self.middle + 1][0] == self.empty:
+            #elif self.lines[self.middle + 1][0] == self.empty:
                 #break
             else:
                 pass
@@ -110,37 +94,37 @@ class Menu():
         screen.refresh()
         screen.clear()
         for index in range(self.rows):
-            name = self.students[index][0]
-            group = self.students[index][1]
+            elem = self.lines[index][0]
+            value = self.lines[index][1]
             line = ''
             clr = 0
             if index == self.middle:
                 clr = self.hilight
                 line += "> "
-                line += "{:30.25}".format(name)
-                if self.freq == '':
-                    line += "{:.3}".format(self.freqs[name])
+                line += "{:30.25}".format(elem)
+                if self.buffer == '':
+                    line += "{:.3}".format(self.current_values[elem])
                 else:
-                    line += "{:.3}".format(self.freq)
+                    line += "{:.3}".format(self.buffer)
             else:
-                if self.freqs[name] == '-':
-                    if 'A' in group:
+                if self.current_values[elem] == '-':
+                    if 'A' in value:
                         clr = self.absent_A
                     else:
                         clr = self.absent_B
                 else:
-                    if 'A' in group:
+                    if 'A' in value:
                         clr = self.present_A
                     else:
                         clr = self.present_B
 
-                line += "{:30.25}".format(name)
-                line += "{:>3}".format(self.freqs[name])
+                line += "{:30.25}".format(elem)
+                line += "{:>3}".format(self.current_values[elem])
             screen.addstr(index, 1, line, curses.color_pair(clr))
 
 #        screen.addstr(20, 50,"Debug:") 
-#        screen.addstr(21, 50,"menu freq: " + '-' + self.freq + '-') 
-#        screen.addstr(22, 50, "Current freq:" + self.freqs[self.students[self.middle][0]])
+#        screen.addstr(21, 50,"menu buffer: " + '-' + self.buffer + '-') 
+#        screen.addstr(22, 50, "Current buffer:" + self.current_values[self.lines[self.middle][0]])
 
 
 class Keyboard():
@@ -165,14 +149,7 @@ class Keyboard():
         self.home = 262
         self.end = 360
 
-def frequency(turma, aula = 0):
-    names = []
-    nusps = []
-    groups = []
-    for name, nusp, group in turma:
-        names.append(name)
-        nusps.append(nusp)
-        groups.append(group)
+def create_menu(elements = [], default_values = [], rows = 0): 
 
     screen = curses.initscr() #initialize curses window
     rows, cols = screen.getmaxyx()
@@ -182,9 +159,9 @@ def frequency(turma, aula = 0):
     curses.start_color()
     if curses.has_colors() == True:
         curses.use_default_colors()
-    screen.keypad(True) # map arrow keys to special values
+    screen.keypad(True) # map arrow keys to special current_values
 
-    menu = Menu(names, nusps, groups, rows)
+    menu = Menu(elements, default_values, rows)
     menu.show(screen)
 
     keyboard = Keyboard()
@@ -194,39 +171,39 @@ def frequency(turma, aula = 0):
             if char == keyboard.esc:
                 break
             elif char == ord('0'):
-                menu.freqs[menu.hname] = '0'
+                menu.current_values[menu.hlght_elem] = '0'
                 #menu.down()
                 menu.tail()
             elif char in keyboard.alphanumerical:
                 if char == ord('q'):
-                    menu.freq = ''
+                    menu.buffer = ''
                 else:
-                    menu.freq += chr(char)
+                    menu.buffer += chr(char)
             elif char == curses.KEY_UP:
                 menu.up()
-                menu.freq = ''
+                menu.buffer = ''
             elif char == curses.KEY_DOWN:
                 menu.down()
-                menu.freq = ''
+                menu.buffer = ''
             elif char == keyboard.enter:
-                if menu.freq == '':
-                    menu.freqs[menu.hname] = menu.hgroup
+                if menu.buffer == '':
+                    menu.current_values[menu.hlght_elem] = menu.hlght_val
                     #menu.down()
                     menu.tail()
                 else:
-                    if menu.freq.upper() in menu.groups:
-                        menu.freqs[menu.hname] = menu.freq.upper()
+                    if menu.buffer.upper() in menu.groups:
+                        menu.current_values[menu.hlght_elem] = menu.buffer.upper()
                         #menu.down()
                         menu.tail()
                     else:
-                        menu.freqs[menu.hname] = '-'
-                    menu.freq = ''
+                        menu.current_values[menu.hlght_elem] = '-'
+                    menu.buffer = ''
             else:
-                menu.freq = ''
+                menu.buffer = ''
 
             menu.show(screen)
 
-            if '-' not in menu.freqs.values():
+            if '-' not in menu.current_values.values():
                 break
 
     finally:
@@ -235,31 +212,31 @@ def frequency(turma, aula = 0):
         curses.nocbreak(); screen.keypad(0); curses.echo()
         curses.endwin()
         output_file = open(f'./grades/freqs/aula_{aula}.csv', "w+")
-        for name, freq in menu.freqs.items():
-            if name != menu.empty:
-                output_file.write(f"{menu.nusps[name]},{freq.replace(' ','')}\n")
-                print(f"{menu.nusps[name]},{freq.replace(' ','')}")
+        for elem, buffer in menu.current_values.items():
+            if elem != menu.empty:
+                output_file.write(f"{menu.nusps[elem]},{buffer.replace(' ','')}\n")
+                print(f"{menu.nusps[elem]},{buffer.replace(' ','')}")
             else:
                 pass
         output_file.close()
 
-def round_name(name = '', end = True):
-    names = name.title().split()
+def round_elem(elem = '', end = True):
+    elems = elem.title().split()
     if end:
         offset = 1
     else:
         offset = 0
-    for index in range(1, len(names) - offset):
-        names[index] = names[index][0] + '.'
-    return ' '.join(names)
+    for index in range(1, len(elems) - offset):
+        elems[index] = elems[index][0] + '.'
+    return ' '.join(elems)
 
 
 if __name__ == '__main__':
     from modules.dummy_class import dummy_class
 
     aula = 98
-    students = 20
-    turma = dummy_class(students)
+    lines = 20
+    turma = dummy_class(lines)
     frequency(turma, aula)
 
     exit(0)
