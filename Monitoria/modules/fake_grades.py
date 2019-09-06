@@ -113,10 +113,10 @@ def fake_grades(turma, aula = 0, act = '' , target = './', parts = 2):
 
 def fake_attedence(turma, aula):
     from random import random
-    from modules.common import Turma
+    from modules.common import Turma, targets
     freq = 0.6
 
-    freq_file = open(f'./grades/freqs/aula_{aula}.csv', 'w')
+    freq_file = open(f'{targets["freq"]}/aula_{aula}.csv', 'w')
     for name, nusp, group in turma.students:
         if random() <= freq:
             freq_file.write(f"{nusp},{group}\n")

@@ -1,3 +1,10 @@
+targets = {
+        'freq' : './grades/freqs',
+        'atc' : './grades/atc',
+        'qp' : './grades/qp',
+        'list' : './grades/lists',
+        }
+
 class Turma(object):
     def __init__(self):
         self.students = []

@@ -1,4 +1,14 @@
 # Disclaimer: This was intentionally not implemented with pandas for portability reasons, but it could be implemented in a more suscint and elegant way using that module
+from modules.common import targets
+
+def already_done(file):
+    from os.path import isfile
+    if isfile(file):
+        print("\033[93mActivity has already been accounted for. Overwrite? (yes/no)\033[0m")
+        ans = input("> ")
+        return ans.lower() not in ('y', 'yes')
+    else:
+        return False
 
 def check_files(files = [], only_one = True):
     '''
@@ -115,6 +125,9 @@ def parse_by_nusp(turma, activity = '', num = 0, target = './'):
         print(f"Invalid activity type {activity}")
         return 1
 
+    if already_done(f'{targets[activity]}/{activity}_{num}.csv'):
+        return 
+
     files = search_dir(target, unique_strings)
     check_files(files, only_one)
 
@@ -168,8 +181,11 @@ def parse_by_nusp(turma, activity = '', num = 0, target = './'):
         final_grades[nusp] /= len(files)
 
     turma.sort()
+    outf = open(f'{targets[activity]}/{activity}_{num}.csv', "w+")
     for name, nusp, group in turma.students:
-        print(f"{nusp} - {final_grades[nusp]}")
+        outf.write(f"{nusp},{final_grades[nusp]}\n")
+        print(f"{final_grades[nusp]}")
+    outf.close()
 
 def parse_by_group(turma, activity = '', num = 0, target = './'):
     '''
@@ -190,6 +206,9 @@ def parse_by_group(turma, activity = '', num = 0, target = './'):
         print(f"Invalid activity type {activity}")
         return 1
 
+    if already_done(f'{targets[activity]}/{activity}_{num}.csv'):
+        return
+
     files = search_dir(target, unique_strings)
 
     check_files(files, only_one)
@@ -201,7 +220,7 @@ def parse_by_group(turma, activity = '', num = 0, target = './'):
     # Accounts the attedence of the given class
     freqs = {}
     try:
-        freq_file = open(f'./grades/freqs/aula_{num}.csv', 'r')
+        freq_file = open(f'{targets["freq"]}/aula_{num}.csv', 'r')
     except FileNotFoundError:
         print("No attedance was made for this class, aborting.")
         return 1
@@ -269,8 +288,48 @@ def parse_by_group(turma, activity = '', num = 0, target = './'):
         final_grades[nusp] = final_groups[ freqs[nusp] ]
 
     turma.sort()
+    outf = open(f'{targets[activity]}/{activity}_{num}.csv', "w+")
     for name, nusp, group in turma.students:
-        print(f"{nusp} - {final_grades[nusp]}")
+        outf.write(f"{nusp},{final_grades[nusp]}\n")
+        print(f"{final_grades[nusp]}")
+    outf.close()
+
+def attendance(turma, aula):
+    '''
+    Using a iteractive menu, takes account of the atendance of a given class
+
+    Usage: Hit enter do atribute the students default group (for the current attendance list) or type in a valid group (invalid groups are discarted). pressing 0 imeadetly acconts an abscence. Uppon a valid input skips to the next student. Use directional arrows to move up and down the menu, <esc> escapes. You can overwrite the attendance of a student by just going back to him. Please be aware that if no mistakes are made (and there is no students in different groups) you can make the attedance ONLY pressing 0 and enter, wich is pretty cool.
+    '''
+    from modules.menu import create_menu, round_name
+
+    if already_done(f'{targets["freq"]}/aula_{aula}.csv'):
+        return
+
+    # Abreviates middle names for a better display (and complicate the code). Maps nusps to abreviated names.
+    names = [ round_name(n) for n in turma.names ]
+    nusps = { round_name(n) : nusp for n, nusp in turma.nusps.items()}
+    dv = [turma.groups[nusp] for nusp in turma.nusps.values() ]
+
+    result = create_menu(names, dv)
+
+    outf = open(f'{targets["freq"]}/aula_{aula}.csv', "w+")
+    for name, freq in result.items():
+        if name != '':
+            outf.write(f"{nusps[name]},{freq.replace(' ','')}\n")
+        else:
+            pass
+    outf.close()
+    
+    end_result = {}
+    for name, freq in result.items():
+        if name != '':
+            end_result[nusps[name]] = freq.replace(' ','')
+
+    turma.sort()
+    for name, nusp, group in turma.students:
+        print(end_result[nusp])
+
+    return
 
 if __name__ == '__main__':
     '''

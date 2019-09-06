@@ -236,30 +236,3 @@ def round_name(name = '', end = True):
     for index in range(1, len(names) - offset):
         names[index] = names[index][0] + '.'
     return ' '.join(names)
-
-
-if __name__ == '__main__':
-    from modules.dummy_class import dummy_class
-
-    aula = 98
-    lines = 20
-    turma = dummy_class(lines)
-    names = []
-    dv = []
-    for name in turma.names:
-        names.append(round_name(name))
-        dv.append(turma.groups[turma.nusps[name]])
-
-    end_result = create_menu(names, dv)
-    print(end_result)
-
-#    output_file = open(f'./grades/freqs/aula_{aula}.csv', "w+")
-#    for elem, buffer in menu.current_values.items():
-#        if elem != menu.empty:
-#            output_file.write(f"{menu.nusps[elem]},{buffer.replace(' ','')}\n")
-#            print(f"{menu.nusps[elem]},{buffer.replace(' ','')}")
-#        else:
-#                pass
-#        output_file.close()
-
-    exit(0)

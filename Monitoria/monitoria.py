@@ -1,34 +1,57 @@
-# It's happening!
-
-def show_class():
-    from collections import defaultdict
-    from threading import Event, Thread
-    from pynput import keyboard
-    from os import system
-
-    class_file = open('./files/dummy_class.csv', 'r')
-
-    groups = defaultdict(list)
-    for line in class_file.read().splitlines():
-
-        try:
-            student, nusp, group = line.split(',')
-        except ValueError:
-            print('Warning, missing value in class file!')
-
-        groups[group].append(student)
-    
-    attedance = []
-    for group in sorted(groups.keys()):
-        for student in groups[group]:
-            attedance.append(f"{student}\t{group}")
-
-    for entry in attedance:
-        print(entry)
-
+from sys import argv
 
 if __name__ == '__main__':
-    show_class()
-    exit(0)
-    
+    aulas = list(filter(lambda x : x.isnumeric(), argv))
+    if '-f' in argv:
+        from modules.parsers import attendance
+        from modules.common import Turma
+        from modules.dummy_class import dummy_class
+
+        turma = dummy_class(15)
+
+        for aula in aulas:
+            attendance(turma, aula)
+
+    elif '-q' in argv:
+        from modules.parsers import parse_by_nusp
+        from modules.dummy_class import dummy_class
+        from modules.fake_grades import fake_grades
+        activity = 'qp'
+
+        turma = dummy_class(15)
+        for aula in aulas:
+            fake_grades(turma, aula, activity, './')
+            parse_by_nusp(turma, activity, aula)
+
+    elif '-l' in argv:
+        from modules.parsers import parse_by_nusp
+        from modules.dummy_class import dummy_class
+        from modules.fake_grades import fake_grades
+        activity = 'list'
+        turma = dummy_class(15)
+
+        for entry in argv[2:]:
+            fake_grades(turma, entry, activity, './')
+            parse_by_nusp(turma, activity, entry)
+
+    elif '-a' in argv:
+        from modules.parsers import parse_by_group
+        from modules.dummy_class import dummy_class
+        from modules.fake_grades import fake_grades, fake_attedence
+        activity = 'atc'
+
+        turma = dummy_class(15)
+        for aula in aulas:
+            fake_grades(turma, aula, activity, './')
+            fake_attedence(turma, aula)
+            parse_by_group(turma, activity, aula)
+
+    elif '-e' in argv:
+        print('Test')
+
+    elif '-m' in argv:
+        print('Mid-Exam')
+
+    else:
+        pass
 
