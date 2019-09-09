@@ -15,7 +15,7 @@ def strTimeProp(start, end, format, prop):
 def RandomDate(start, end, prop):
     return strTimeProp(start, end, '%d/%m/%Y %H:%M', prop)
 
-def fake_grades(turma, aula = 0, act = '' , target = './', parts = 2):
+def fake_grades(turma, activity = '', num = 0, target = '.', parts = 2):
     from datetime import date, datetime
     from modules.common import Turma
     from random import random
@@ -41,18 +41,18 @@ def fake_grades(turma, aula = 0, act = '' , target = './', parts = 2):
     fake_year = ['1/1/2027 0:01', '1/1/2027 23:59']
 
     files = []
-    if act == 'qp':
+    if activity == 'qp':
         act_identifier = 'QPrev'
         part = ''
-        files.append(f"{course_code}-2019-{act_identifier} - aula {aula}{part}-notas.csv")
-    elif act == 'atc':
+        files.append(f"{target}/{course_code}-2019-{act_identifier} - aula {num}{part}-notas.csv")
+    elif activity == 'atc':
         act_identifier = 'ATC'
         for part in range(parts):
-            files.append(f"{course_code}-2019-{act_identifier}-{int(aula):02d} (parte {part + 1})-notas.csv")
-    elif act == 'list':
+            files.append(f"{target}/{course_code}-2019-{act_identifier}-{num:02d} (parte {part + 1})-notas.csv")
+    elif activity == 'list':
         num_part = ''
         char_part = ''
-        for char in aula:
+        for char in str(num):
             if char.isdigit():
                 num_part = num_part + char
             else:
@@ -61,10 +61,10 @@ def fake_grades(turma, aula = 0, act = '' , target = './', parts = 2):
             part = f" (parte {char_part.upper()})"
         else:
             part = ''
-        files.append(f"{course_code}-2019-Lista {num_part}{part}-notas.csv")
+        files.append(f"{target}/{course_code}-2019-Lista {num_part}{part}-notas.csv")
 
     for file in files:
-        dfile = open(str(target+file), 'w+')
+        dfile = open(file, 'w+')
 
         for field in fields:
             dfile.write(field)
@@ -111,12 +111,12 @@ def fake_grades(turma, aula = 0, act = '' , target = './', parts = 2):
 
         dfile.close()
 
-def fake_attedence(turma, aula):
+def fake_attedence(turma, num):
     from random import random
     from modules.common import Turma, targets
     freq = 0.6
 
-    freq_file = open(f'{targets["freq"]}/aula_{aula}.csv', 'w')
+    freq_file = open(f'{targets["freq"]}/freq_{num}.csv', 'w+')
     for name, nusp, group in turma.students:
         if random() <= freq:
             freq_file.write(f"{nusp},{group}\n")
@@ -124,11 +124,32 @@ def fake_attedence(turma, aula):
             freq_file.write(f"{nusp},0\n")
     freq_file.close()
 
+def fake_exam(turma, exam_type = 'exam', num = 0, target = '.'):
+    from random import random
+    from modules.common import Turma
+    freq = 0.6
+
+    if exam_type == 'exam':
+        grade_file = open(f"{target}/Prova {num}.csv", 'w+')
+    elif exam_type == 'mid_exam':
+        grade_file = open(f"{target}/Provinha {num}.csv", 'w+')
+    else:
+        grade_file = open(f"{target}/{exam_type} {num}.csv", 'w+')
+    
+
+    grade_file.write(f"nusp,nota\n")
+    for name, nusp, group in turma.students:
+        if random() <= freq:
+            grade_file.write(f"{nusp},{10 * random():.3f}\n")
+        else:
+            grade_file.write(f"{nusp},\n")
+    grade_file.close()
+
 if __name__ == '__main__':
     from dummy_class import dummy_class
 
     turma = dummy_class(10)
-    aula = 98
-    act = 'atc'
-    fake_grades(turma, aula, act)
+    num = 98
+    activity = 'atc'
+    fake_grades(turma, activity, num)
     exit(0)

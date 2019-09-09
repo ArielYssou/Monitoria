@@ -42,3 +42,8 @@ class InvalidInputError(Error):
 
     def __init__(self, message):
         self.message = message
+
+class StudentNotInClassError(Error):
+    '''Exception raised if a external student is found during parsing '''
+    def __init__(self, message):
+        self.message = message

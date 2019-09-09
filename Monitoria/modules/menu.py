@@ -227,7 +227,7 @@ def create_menu(elements = [], default_values = [], rows = 0):
         curses.endwin()
         return menu.current_values
 
-def round_name(name = '', end = True):
+def abbreviate_name(name = '', end = True):
     names = name.title().split()
     if end:
         offset = 1

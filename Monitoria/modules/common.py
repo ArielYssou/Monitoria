@@ -1,9 +1,13 @@
 targets = {
         'freq' : './grades/freqs',
-        'atc' : './grades/atc',
-        'qp' : './grades/qp',
+        'atc' : './grades/atcs',
+        'qp' : './grades/qps',
         'list' : './grades/lists',
+        'exam' : './grades/exams',
+        'mid_exam': './grades/mid_exams'
         }
+
+class_file = './files/Chamada.csv'
 
 class Turma(object):
     def __init__(self):
@@ -44,6 +48,15 @@ class Turma(object):
         for name, group in new_list:
             self.add(name, self.nusps[name], group.replace(' ',''))
 
+def load_turma():
+    turma = Turma()
+    with open(class_file, 'r') as f:
+        for line in f.read().splitlines():
+            name, nusp, group = line.split(',')
+            turma.add(name, nusp, group)
+    return turma
+
+    
 def search_dir(target = './', search_for = [''], match_all = True):
     '''
     INPUT: Target to directory. List of substrings to search
