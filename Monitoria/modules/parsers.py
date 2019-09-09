@@ -282,7 +282,7 @@ def parse_by_group(turma, activity = '', num = 0, target = '/home/ariel/Download
                 freq[str(nusp)] = '0'
 
     # Locates the indexes of the columns containing the nusps and the grades
-    nusp_idx, grade_idx = seek_column_index(files[0], identifiers, sep, persist)
+    nusp_idx, grade_idx = seek_column_index(target + '/' + files[0], identifiers, sep, persist)
 
     final_grades = {}
     for nusp in turma.nusps.values():
@@ -293,6 +293,7 @@ def parse_by_group(turma, activity = '', num = 0, target = '/home/ariel/Download
         final_groups[group] = 0
 
     for file in files:
+        file = target + '/' + file
         grades = {}
         group_grades = {}
         with open(file, 'r') as f:

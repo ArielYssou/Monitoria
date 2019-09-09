@@ -1,5 +1,8 @@
 def mean(arr = []):
-    return sum(arr) / len(arr)
+    if len(arr) > 0:
+        return sum(arr) / len(arr)
+    else:
+        return 0
 
 def GroupGenerator():
     num = 0
@@ -78,7 +81,7 @@ def forge_groups(turma):
     while True:
         final_grades = grades_repos.copy()
         new_group = {}
-        siberia_tresh = 3.5
+        siberia_tresh = 1
         for nusp, grade in final_grades.items():
             if grade < siberia_tresh:
                 new_group[nusp] = '13S'
