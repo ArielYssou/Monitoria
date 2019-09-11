@@ -12,5 +12,5 @@ setup(
     author_email='arielyssou@gmail.com',
     #packages=['modules'],  #same as name
     install_requires=['faker', 'random', 'curses', 'datetime', 'shutil'], #external packages as dependencies
-    data_files=[('./files', []), ('./grades', ['qps', 'atcs', 'lists', 'exams', 'mid_exams','freqs'])]
+    #data_files=[('./files', []), ('./grades', []),('./grades/*', []) ]
 )
