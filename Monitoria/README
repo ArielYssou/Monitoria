@@ -1,0 +1,6 @@
+Hi there!
+
+This code was created to help with the monitoring of the 'scale-up' courses in USP. To install it just clone directly from github:
+git clone git@github.com:ArielYssou/Monitoria.git 
+and run `python3 setup.py install' to install all dependencies. The user is expected to input a "./files/Chamada.csv" containing the name, nusp and group for each student.
+To test any functionality with a "dummy" class just use 'pytohn3 monitoria -t f', for example. To print help use the '-h' flag.
