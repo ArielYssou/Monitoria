@@ -1,3 +1,5 @@
+fake_id = '(fake)'
+
 def strTimeProp(start, end, format, prop):
     from time import mktime, strftime, strptime, localtime
     """Get a time at a proportion of a range of two formatted times.
@@ -44,11 +46,11 @@ def fake_grades(turma, activity = '', num = 0, target = '.', parts = 2):
     if activity == 'qp':
         act_identifier = 'QPrev'
         part = ''
-        files.append(f"{target}/{course_code}-2019-{act_identifier} - aula {num}{part}-notas.csv")
+        files.append(f"{target}/{fake_id}{course_code}-2019-{act_identifier} - aula {num}{part}-notas.csv")
     elif activity == 'atc':
         act_identifier = 'ATC'
         for part in range(parts):
-            files.append(f"{target}/{course_code}-2019-{act_identifier}-{num:02d} (parte {part + 1})-notas.csv")
+            files.append(f"{target}/{fake_id}{course_code}-2019-{act_identifier}-{num:02d} (parte {part + 1})-notas.csv")
     elif activity == 'list':
         num_part = ''
         char_part = ''
@@ -61,7 +63,7 @@ def fake_grades(turma, activity = '', num = 0, target = '.', parts = 2):
             part = f" (parte {char_part.upper()})"
         else:
             part = ''
-        files.append(f"{target}/{course_code}-2019-Lista {num_part}{part}-notas.csv")
+        files.append(f"{target}/{fake_id}{course_code}-2019-Lista {num_part}{part}-notas.csv")
 
     for file in files:
         dfile = open(file, 'w+')
@@ -84,7 +86,7 @@ def fake_grades(turma, activity = '', num = 0, target = '.', parts = 2):
             dfile.write(nome + ',')
             
             # Email
-            fake_mail = nome.lower()
+            fake_mail = nome.lower().replace('.','')
             fake_mail += '.' + str(names[1]).lower()
             fake_mail += '@usp.br'
             dfile.write(fake_mail + ',')
@@ -116,7 +118,7 @@ def fake_attedence(turma, num):
     from modules.common import Turma, targets
     freq = 0.6
 
-    freq_file = open(f'{targets["freq"]}/freq_{num}.csv', 'w+')
+    freq_file = open(f'{targets["freq"]}/{fake_id}freq_{num}.csv', 'w+')
     for name, nusp, group in turma.students:
         if random() <= freq:
             freq_file.write(f"{nusp},{group}\n")
@@ -130,13 +132,12 @@ def fake_exam(turma, exam_type = 'exam', num = 0, target = '.'):
     freq = 0.6
 
     if exam_type == 'exam':
-        grade_file = open(f"{target}/Prova {num}.csv", 'w+')
+        grade_file = open(f"{target}/{fake_id}Prova {num}.csv", 'w+')
     elif exam_type == 'mid_exam':
-        grade_file = open(f"{target}/Provinha {num}.csv", 'w+')
+        grade_file = open(f"{target}/{fake_id}Provinha {num}.csv", 'w+')
     else:
-        grade_file = open(f"{target}/{exam_type} {num}.csv", 'w+')
+        grade_file = open(f"{target}/{fake_id}{exam_type} {num}.csv", 'w+')
     
-
     grade_file.write(f"nusp,nota\n")
     for name, nusp, group in turma.students:
         if random() <= freq:
@@ -145,11 +146,33 @@ def fake_exam(turma, exam_type = 'exam', num = 0, target = '.'):
             grade_file.write(f"{nusp},\n")
     grade_file.close()
 
-if __name__ == '__main__':
-    from dummy_class import dummy_class
+def dummy_class(students = 0):
+    '''
+    INPUT: number of students in the fake class
+    '''
+    from faker import Faker
+    from modules.common import Turma
+    from random import randint
 
-    turma = dummy_class(10)
-    num = 98
-    activity = 'atc'
-    fake_grades(turma, activity, num)
-    exit(0)
+    fake = Faker('pt_BR')
+
+    names = [ fake.name() for i in range(students) ]
+
+    nusps = []
+    for index in range(students):
+        nusps.append(randint(int(1e6), int(1.2e7)))
+
+    groups = [ "{}".format(num) + letter
+        for num in range(1,13)
+        for letter in ['A', 'B']]
+
+    fake_class = Turma()
+    group_index = 0
+    members = 0
+    for name, nusp in list(zip(names, nusps)):
+        fake_class.add(name, nusp, groups[group_index])
+        members += 1
+        if members == 3:
+            members = 0
+            group_index += 1
+    return fake_class

@@ -74,9 +74,9 @@ def search_dir(target = './', search_for = [''], match_all = True):
                     matches += 1
             if match_all:
                 if matches == len(search_for):
-                    files.append(item)
+                    files.append(path.join(target, item))
             elif matches > 0:
-                files.append(item)
+                files.append(path.join(target, item))
             else:
                 pass
     return files

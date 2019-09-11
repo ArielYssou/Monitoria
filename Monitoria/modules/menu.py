@@ -73,7 +73,6 @@ class Menu():
         '''
         if self.lines[self.middle + 1][0] == self.empty:
             self.rewind()
-            pass
         else:
             var = self.lines.pop(0)
             self.lines.append(var)
@@ -83,14 +82,14 @@ class Menu():
         '''
         Moves the menu down to the next unacconted element.
         '''
-        while self.lines[self.middle][1] != '-':
+        while True:
             self.down()
-            if '-' not in self.current_values:
+            if self.current_values[self.lines[self.middle][0]] == '-':
                 break
-            #elif self.lines[self.middle + 1][0] == self.empty:
-                #break
+            elif '-' not in self.current_values:
+                break
             else:
-                pass
+                continue
 
     def show(self, screen):
         '''
@@ -185,14 +184,15 @@ def create_menu(elements = [], default_values = [], rows = 0):
             if char == keyboard.esc:
                 break
             elif char == ord('0'):
-                menu.current_values[hlght_elem] = '0'
-                #menu.down()
-                menu.tail()
-            elif char in keyboard.alphanumerical:
-                if char == ord('q'):
-                    menu.buffer = ''
+                if menu.buffer == '':
+                    menu.current_values[hlght_elem] = '0'
+                    menu.tail()
                 else:
                     menu.buffer += chr(char)
+            elif char == curses.KEY_BACKSPACE:
+                menu.buffer = menu.buffer[:-1]
+            elif char in keyboard.alphanumerical:
+                menu.buffer += chr(char)
             elif char == curses.KEY_UP:
                 menu.up()
                 menu.buffer = ''

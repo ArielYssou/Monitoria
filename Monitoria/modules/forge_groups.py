@@ -15,18 +15,13 @@ def GroupGenerator():
             num += 1
         yield str(num) + char
 
-def forge_groups(turma):
+def forge_groups(turma, test = False):
     from modules.common import targets, search_dir, Turma, class_file
     from modules.errors import StudentNotInClassError, InvalidInputError 
     from random import shuffle
     from datetime import datetime
     from os.path import isfile
     from shutil import copyfile
-
-    grades = {}
-    for activity, target in targets.items():
-        for name, nusp, group in turma.students:
-            grades[(activity, nusp)] = []
 
     weights = {
             'freq' : 1,
@@ -38,6 +33,11 @@ def forge_groups(turma):
             }
     norm = sum(weights.values())
 
+    grades = {}
+    for activity, target in targets.items():
+        for name, nusp, group in turma.students:
+            grades[(activity, nusp)] = []
+
     for activity in targets.keys():
         if activity not in weights.keys():
             raise InvalidInputError(f"You forgot to issue the weight for activity {activity}")
@@ -46,9 +46,8 @@ def forge_groups(turma):
 
     for activity, target in targets.items():
         for file in search_dir(targets[activity], activity):
-            with open(f"{targets[activity]}/{file}", 'r') as f:
+            with open(f"{file}", 'r') as f:
                 for line in f.read().splitlines():
-                    print(line)
                     nusp, grade = line.split(',')
                     if nusp in turma.nusps.values():
                         if grade not in ('-', ''):
@@ -60,15 +59,10 @@ def forge_groups(turma):
                                 grades[(activity, nusp)].append(grade)
                         else:
                             grades[(activity, nusp)].append(0)
-                    else:
-                        raise StudentNotInClassError(f"Intruder! {nusp}")
-    
+
     final_grades = {}
     names = {}
     for activity, target in targets.items():
-        print('-' * 70)
-        print(activity)
-        print('-' * 70)
         for name, nusp, group in turma.students:
             names[nusp] = name
             if nusp not in final_grades.keys():
@@ -89,8 +83,7 @@ def forge_groups(turma):
         for nusp, grade in new_group.items():
             final_grades.pop(nusp)
 
-        sorted_grades = sorted( final_grades.items(), key = lambda x: x[1] ) 
-        
+        sorted_grades = sorted( final_grades.items(), key = lambda x: x[1]) 
         tier_sizes = int( len(sorted_grades) / 3 )
 
         tiers = [[] , [], []]
@@ -135,7 +128,7 @@ def forge_groups(turma):
         turma = Turma()
         for nusp, group in new_group.items():
             turma.add(names[nusp], nusp, group)
-        turma.group_sort()
+        print(turma.students)
 
         for name, nusp, group in turma.students:
             if 'A' in group:
@@ -149,6 +142,11 @@ def forge_groups(turma):
         print("Are you satisfied with these groups? (yes/no)")
         ans = input("> ")
         if ans.lower() in ('y', 'yes'):
+            if test:
+                break
+            else:
+                pass
+            
             fname = f'./files/old/Chamada_{datetime.now().strftime("%B")}.csv'
             print(f"Backing up last group composition under \'{fname}\'")
             if isfile(fname):

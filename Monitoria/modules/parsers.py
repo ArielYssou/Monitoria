@@ -104,30 +104,6 @@ def seek_column_index(file, strings = [], sep = ',', persist = True):
                         else:
                             pass
                     index += 1
-
-            # Try again seeking "nusp-like" and "grade-like" numbers
-#            if -1 in indexes.values():
-#                print("try 2")
-#                indexes = {}
-#                for string in strings:
-#                    indexes[string] = -1
-#                with open(file, 'r') as f:
-#                    fields = f.readline().strip().rsplit(sep)
-#                    index = 0
-#                    for field in fields:
-#                        if field.isnumeric():
-#                            if int(field) > 10000:
-#                                indexes['nusp'] = index
-#                        else:
-#                            try:
-#                                num = float(field)
-#                            except ValueError:
-#                                pass
-#                            else:
-#                                indexes['avaliar'] = index # Standard names for the grades string
-#                                indexes['nota'] = index #
-#                        index += 1
-
     pos = 0
     for value in indexes.values():
         if value == -1:
@@ -182,7 +158,7 @@ def parse_by_nusp(turma, activity = '', num = 0, target = '/home/ariel/Downloads
         print(f"\033[38;5;2m{file}\033[0m")
 
     # Locates the indexes of the columns containing the nusps and the grades
-    nusp_idx, grade_idx = seek_column_index(target + '/'  + files[0], identifiers, sep, persist)
+    nusp_idx, grade_idx = seek_column_index(files[0], identifiers, sep, persist)
 
     final_grades = {}
     for nusp in turma.nusps.values():
@@ -190,7 +166,6 @@ def parse_by_nusp(turma, activity = '', num = 0, target = '/home/ariel/Downloads
 
     for file in files:
         grades = {}
-        file = target + '/' + file
         with open(file, 'r') as f:
             next(f)
             for line in f.read().splitlines():
@@ -282,7 +257,7 @@ def parse_by_group(turma, activity = '', num = 0, target = '/home/ariel/Download
                 freq[str(nusp)] = '0'
 
     # Locates the indexes of the columns containing the nusps and the grades
-    nusp_idx, grade_idx = seek_column_index(target + '/' + files[0], identifiers, sep, persist)
+    nusp_idx, grade_idx = seek_column_index(files[0], identifiers, sep, persist)
 
     final_grades = {}
     for nusp in turma.nusps.values():
@@ -293,7 +268,6 @@ def parse_by_group(turma, activity = '', num = 0, target = '/home/ariel/Download
         final_groups[group] = 0
 
     for file in files:
-        file = target + '/' + file
         grades = {}
         group_grades = {}
         with open(file, 'r') as f:
@@ -351,7 +325,9 @@ def attendance(turma, aula):
     '''
     from modules.menu import create_menu, abbreviate_name
 
-    if already_done(f'{targets["freq"]}/freq_{aula}.csv'):
+    activity = 'freq'
+
+    if already_done(f'{targets[activity]}/{activity}_{aula}.csv'):
         return
 
     # Abbreviates middle names for a better display (and to complicate the code). Maps nusps to abbreviated names.
@@ -361,7 +337,7 @@ def attendance(turma, aula):
 
     result = create_menu(names, dv)
 
-    outf = open(f'{targets["freq"]}/freq_{aula}.csv', "w+")
+    outf = open(f'{targets[activity]}/{activity}_{aula}.csv', "w+")
     for name, freq in result.items():
         if name != '':
             outf.write(f"{nusps[name]},{freq.replace(' ','')}\n")
@@ -379,30 +355,3 @@ def attendance(turma, aula):
         print(end_result[nusp])
 
     return
-
-if __name__ == '__main__':
-    '''
-        Tests the functions with a dummy class when called as main
-    '''
-    from modules.dummy_class import dummy_class
-    from modules.fake_grades import fake_grades, fake_attedence
-
-    students = 10
-    activity = 'list'
-    turma = dummy_class(students)
-
-    for name, nusp, group in turma.students:
-        print(f'{name} - {nusp} - {group}')
-    print('-' * 70)
-
-    num = '1a'
-    fake_grades(turma, num, activity, './')
-    fake_attedence(turma, num)
-
-    if activity == 'act':
-        parse_by_group(turma, activity, num) 
-    else:
-        parse_by_nusp(turma, activity, num) 
-
-    exit(0)
-
