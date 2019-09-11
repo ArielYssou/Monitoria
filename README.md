@@ -1,6 +1,17 @@
 # Monitoria
 
- Parses grades imported from moodle (seeks for files in the directory ~/Downloads by default) and arranges then for easy exportation and storage. Can take account of the attendance of a given class inputted by the user using a interactive menu. Can also establish new group formations based on grades and average attendance of each student.
+ This code was created to help with the monitoring of the 'scale-up' courses in USP. It parses grades imported from moodle (seeks the grade files in ~/Downloads by default) and arranges then for easy exportation and storage. Can take account of the attendance of a given class inputted by the user using a interactive menu. Can also establish new group formations based on grades and on the average attendance of each student.
+
+## Instalation
+
+ Clone it directly:
+
+`git clone git@github.com:ArielYssou/Monitoria.git`
+`cd Monitoria`
+
+And install dependencies:
+
+`python3 setup.py install`
 
 ## Synopsis
         monitoria.sh [-h] [-f <class number>] [-q <class number>] [-a <class number>] [-l <list number>] [-e <exam number>] [-m mid-exam number ] [-t {f,q,a,l,e,m,g}]
