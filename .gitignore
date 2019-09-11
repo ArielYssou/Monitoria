@@ -1,0 +1,17 @@
+grades/atcs/*
+grades/qps/*
+grades/lists/*
+grades/exams/*
+grades/mid_exams/*
+grades/freqs/*
+files/Chamada.csv
+files/old/*
+
+!grades/atcs/.gitkeep
+!grades/qps/.gitkeep
+!grades/lists/.gitkeep
+!grades/exams/.gitkeep
+!grades/mid_exams/.gitkeep
+!grades/freqs/.gitkeep
+!files/old/.gitkeep
+
