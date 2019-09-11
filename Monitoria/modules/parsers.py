@@ -1,5 +1,8 @@
 # Disclaimer: This was intentionally not implemented with pandas for portability reasons, but it could be implemented in a more slick and elegant way using that module
 from modules.common import targets
+from pathlib import Path
+
+home = str(Path.home())
 
 def already_done(file):
     from os.path import isfile
@@ -113,7 +116,7 @@ def seek_column_index(file, strings = [], sep = ',', persist = True):
 
     return tuple(indexes.values())
 
-def parse_by_nusp(turma, activity = '', num = 0, target = '/home/ariel/Downloads', identifiers = ['usp', 'avaliar'] , sep = ',', persist = True):
+def parse_by_nusp(turma, activity = '', num = 0, target = f'{home}/Downloads', identifiers = ['usp', 'avaliar'] , sep = ',', persist = True):
     '''
     INPUT:
         Object <Turma> defined in the modules.common module (Essentially a list of tuples containing the name, nusp and group of the students)
@@ -211,7 +214,7 @@ def parse_by_nusp(turma, activity = '', num = 0, target = '/home/ariel/Downloads
         print(f"{final_grades[nusp]}")
     outf.close()
 
-def parse_by_group(turma, activity = '', num = 0, target = '/home/ariel/Downloads', identifiers = ['usp', 'avaliar'], sep =',', persist = True):
+def parse_by_group(turma, activity = '', num = 0, target = f'{home}/Downloads', identifiers = ['usp', 'avaliar'], sep =',', persist = True):
     '''
     INPUT:
         1) Object <Turma> defined in the modules.common module (Essentially a list of tuples containing the name, nusp and group of the students)
