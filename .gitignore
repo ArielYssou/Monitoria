@@ -1,17 +1,17 @@
-grades/atcs/*
-grades/qps/*
-grades/lists/*
-grades/exams/*
-grades/mid_exams/*
-grades/freqs/*
-files/Chamada.csv
-files/old/*
+./Monitoria/grades/atcs/*
+./Monitoria/grades/qps/*
+./Monitoria/grades/lists/*
+./Monitoria/grades/exams/*
+./Monitoria/grades/mid_exams/*
+./Monitoria/grades/freqs/*
+./Monitoria/files/Chamada.csv
+./Monitoria/files/old/*
 
-!grades/atcs/.gitkeep
-!grades/qps/.gitkeep
-!grades/lists/.gitkeep
-!grades/exams/.gitkeep
-!grades/mid_exams/.gitkeep
-!grades/freqs/.gitkeep
-!files/old/.gitkeep
+!./Monitoria/grades/atcs/.gitkeep
+!./Monitoria/grades/qps/.gitkeep
+!./Monitoria/grades/lists/.gitkeep
+!./Monitoria/grades/exams/.gitkeep
+!./Monitoria/grades/mid_exams/.gitkeep
+!./Monitoria/grades/freqs/.gitkeep
+!./Monitoria/files/old/.gitkeep
 
