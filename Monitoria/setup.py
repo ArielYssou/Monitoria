@@ -10,7 +10,7 @@ setup(
     author='Ariel Yssou',
     long_description=long_description,
     author_email='arielyssou@gmail.com',
-    packages=['modules'],  #same as name
+    #packages=['modules'],  #same as name
     install_requires=['faker', 'random', 'curses', 'datetime', 'shutil'], #external packages as dependencies
     data_files=[('./files', []), ('./grades', ['qps', 'atcs', 'lists', 'exams', 'mid_exams','freqs'])]
 )
