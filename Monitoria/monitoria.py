@@ -5,11 +5,12 @@ def helper():
     print(
 	'''
         monitoria.sh 
+
 Description:
-	monirotia.sh: Parses grades imported from moodle (seeks for files in the directory ~/Downloads by default) and arranges then for easy exportation and storage. Can take account of the attendance of a given class inputted by the user using a interactive menu. Also establishes new group formations based on grades and mean attendance of each student.
+	monirotia.sh: Parses grades imported from moodle (seeks for files in the directory ~/Downloads by default) and arranges then for easy exportation and storage. Can take account of the attendance of a given class inputted by the user using a interactive menu. Can also establish new group formations based on grades and average attendance of each student.
 
 Synopsis
-        monitoria.sh [-h] [-f <class number>] [-q <class number>] [-a <class number>] [-l <list number>] [-e <exam number>] [-m mid-exam number ] [-t (f|q|a|l|e|m|g)] [-g] [-s] [-d] [-r]
+        monitoria.sh [-h] [-f <class number>] [-q <class number>] [-a <class number>] [-l <list number>] [-e <exam number>] [-m mid-exam number ] [-t (f|q|a|l|e|m|g)] [-g] [-s] [-r]
 
 Options
 	-h|     This help text
@@ -22,7 +23,6 @@ Options
 	-g|     Composes a new attendance list based on the average grade of each student and his/hers attendance up to the most recent class. Prompts the user until he/her is satisfied or wishes to exit. Changes only take place when a new list is explicitly accepted.
         -t|     Run a test between {q,a,l,e,m,g} for each functionality mentioned above (with the same char characterizing it). Uses a "dummy" class and removes any new files upon completion.
         -s|     [WIP] Setup. Checks if modules and directories are in place, checks all dependencies
-        -d|     [WIP] Prints all dependencies.
         -r|     [WIP] Data analysis and visualization for: Grades evolution, correlations between activities, evolution of average attendance. Connectivity graph between students.
 
 Author
