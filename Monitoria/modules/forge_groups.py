@@ -75,7 +75,7 @@ def forge_groups(turma, test = False):
     while True:
         final_grades = grades_repos.copy()
         new_group = {}
-        siberia_tresh = 1
+        siberia_tresh = 3.0
         for nusp, grade in final_grades.items():
             if grade < siberia_tresh:
                 new_group[nusp] = '13S'
@@ -85,6 +85,9 @@ def forge_groups(turma, test = False):
 
         sorted_grades = sorted( final_grades.items(), key = lambda x: x[1]) 
         tier_sizes = int( len(sorted_grades) / 3 )
+        exceding = len(sorted_grades) % 3 
+        print(tier_sizes)
+        print(len(sorted_grades))
 
         tiers = [[] , [], []]
         leftovers = []
@@ -92,8 +95,9 @@ def forge_groups(turma, test = False):
             for index in range(tier_sizes):
                 tiers[tier].append( sorted_grades.pop() )
             if tier == 1:
-                for index in range(len(sorted_grades) % 3):
+                for index in range(exceding):
                     leftovers.append( sorted_grades.pop() )
+            print(len(sorted_grades))
 
         for tier in tiers:
             shuffle(tier)
@@ -128,7 +132,7 @@ def forge_groups(turma, test = False):
         turma = Turma()
         for nusp, group in new_group.items():
             turma.add(names[nusp], nusp, group)
-        print(turma.students)
+        turma.group_sort()
 
         for name, nusp, group in turma.students:
             if 'A' in group:
@@ -156,6 +160,8 @@ def forge_groups(turma, test = False):
                     copyfile(class_file, fname)
                 else:
                     break
+            else:
+                copyfile(class_file, fname)
 
             for name, nusp, group in turma.students:
                 print(f"{name},{nusp},{group}")
